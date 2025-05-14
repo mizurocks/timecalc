@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hours and minutes calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* General body and typography */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff; /* White background */
+            color: #333; /* Default text color */
+            text-transform: lowercase; /* Apply lowercase to all text by default */
+        }
+
+        /* Container for the calculator */
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff; /* White container background */
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 4px 10px -1px rgba(0, 0, 0, 0.1), 0 2px 6px -1px rgba(0, 0, 0, 0.06); /* Softer shadow */
+        }
+
+        /* Heading style - uses Inter, styled with Tailwind */
+        h1 {
+            color: #285a68; /* Dark Teal */
+            /* Tailwind classes will handle size, weight, alignment */
+        }
+
+        /* Styling for each session input row */
+        .session-row {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 1px solid #a2bfca; /* Very Light Teal border */
+            border-radius: 0.5rem; /* Rounded corners for session rows */
+            background-color: #f7fbfc; /* Very light teal/cyan background for rows */
+        }
+
+        /* Flex container for hours and minutes inputs */
+        .input-group {
+            display: flex;
+            gap: 0.75rem; /* Increased gap slightly */
+            align-items: center;
+        }
+
+        /* Input field styling */
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #a2bfca; /* Very Light Teal border */
+            border-radius: 0.375rem; /* Rounded corners for inputs */
+            text-align: center;
+            font-size: 1rem;
+            background-color: #ffffff;
+            color: #333;
+            text-transform: none; /* Allow numbers and prevent forced lowercase if not desired for input values */
+        }
+        .input-field:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #285a68; /* Dark Teal border on focus */
+            box-shadow: 0 0 0 3px rgba(40, 90, 104, 0.25); /* Shadow with Dark Teal color */
+        }
+        .input-field::placeholder {
+            color: #9f9f9f; /* Medium Gray for placeholder */
+            text-transform: lowercase; /* Ensure placeholder is lowercase */
+        }
+
+        /* Label text for inputs */
+        .label-text {
+            font-size: 0.875rem;
+            color: #5f5f5f; /* Dark Gray for labels */
+            margin-bottom: 0.25rem; /* Space below label when stacked */
+            display: block; /* Ensure it takes space */
+            /* text-transform: lowercase; is inherited from body */
+        }
+
+        /* General button styling */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            text-align: center;
+            border: none; /* Remove default border */
+            /* text-transform: lowercase; is inherited from body */
+        }
+
+        /* Primary button (Calculate) */
+        .btn-primary {
+            background-color: #285a68; /* Dark Teal */
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #497c89; /* Medium Teal */
+            box-shadow: 0 0 0 3px rgba(73, 124, 137, 0.3);
+        }
+
+        /* Secondary buttons (Add Session, Clear All) */
+        .btn-secondary {
+            background-color: #5f5f5f; /* Dark Gray */
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #4a4a4a; /* Darker Gray for hover */
+            box-shadow: 0 0 0 3px rgba(95, 95, 95, 0.3);
+        }
+
+        /* Danger button (Remove session 'X') */
+        .btn-danger {
+            background-color: #9f9f9f; /* Medium Gray */
+            color: white;
+            padding: 0.5rem 0.75rem; /* Smaller padding */
+            font-size: 0.875rem; /* Smaller font */
+            line-height: 1.25; /* Adjust line height for 'X' */
+        }
+        .btn-danger:hover {
+            background-color: #5f5f5f; /* Dark Gray on hover */
+        }
+
+        /* Result display area */
+        .result-area {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #e0f7fa; /* Custom very light cyan/teal */
+            border: 1px solid #a2bfca; /* Very Light Teal border */
+            border-radius: 0.5rem;
+            text-align: center;
+            /* text-transform: lowercase; is inherited from body */
+        }
+        .result-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #285a68; /* Dark Teal text */
+        }
+        .result-subtext {
+            font-size: 1rem;
+            color: #497c89; /* Medium Teal text */
+        }
+
+        /* Error message box styling */
+        #errorMessageBox {
+            background-color: #fff0f0; /* Light reddish background */
+            border: 1px solid #d98282; /* Reddish border */
+            color: #a94442; /* Dark red text */
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            margin-top: 1rem;
+            text-align: center;
+            /* text-transform: lowercase; is inherited from body */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 480px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.25rem; /* Reduced gap for column layout */
+            }
+            .input-group > div { /* Each input field container */
+                width: 100%;
+                margin-bottom: 0.75rem; /* Space between hours and minutes input groups */
+            }
+             .input-group > div:last-child {
+                margin-bottom: 0;
+            }
+            .input-group .btn-danger { /* Ensure remove button aligns well in column */
+                margin-top: 0.5rem;
+                width: auto; /* Don't make X button full width */
+                align-self: flex-end; /* Align to the right */
+            }
+            .label-text {
+                margin-left: 0; /* Remove left margin for stacked labels */
+            }
+            .btn { /* Make all main action buttons full width on small screens */
+                width: 100%;
+            }
+            .button-container { /* This class is on the div wrapping action buttons */
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem; /* Space between stacked buttons */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center mb-8">time calculator</h1>
+
+        <div id="sessionsContainer">
+            <div class="session-row">
+                <div class="input-group">
+                    <div class="flex-1">
+                        <label for="hours1" class="label-text">hours</label>
+                        <input type="number" min="0" class="input-field hours-input" placeholder="0" id="hours1">
+                    </div>
+                    <div class="flex-1">
+                        <label for="minutes1" class="label-text">minutes</label>
+                        <input type="number" min="0" max="59" class="input-field minutes-input" placeholder="0" id="minutes1">
+                    </div>
+                    </div>
+            </div>
+        </div>
+
+        <div class="button-container mt-6 flex flex-col sm:flex-row gap-3">
+            <button id="addSessionBtn" class="btn btn-secondary flex-grow">add another session</button>
+            <button id="clearAllBtn" class="btn btn-secondary flex-grow">clear all</button>
+            <button id="calculateBtn" class="btn btn-primary flex-grow">calculate total</button>
+        </div>
+
+        <div id="errorMessageBox" class="hidden">
+            <p id="errorMessageText"></p>
+        </div>
+
+        <div id="resultArea" class="result-area hidden">
+            <p class="result-text" id="totalTime"></p>
+            <p class="result-subtext" id="totalMinutes"></p>
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const sessionsContainer = document.getElementById('sessionsContainer');
+        const addSessionBtn = document.getElementById('addSessionBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resultArea = document.getElementById('resultArea');
+        const totalTimeEl = document.getElementById('totalTime');
+        const totalMinutesEl = document.getElementById('totalMinutes');
+        const errorMessageBox = document.getElementById('errorMessageBox');
+        const errorMessageText = document.getElementById('errorMessageText');
+
+        let sessionCounter = 1; // To give unique IDs to new inputs
+
+        // Function to hide the error message
+        function hideError() {
+            errorMessageBox.classList.add('hidden');
+            errorMessageText.textContent = '';
+        }
+
+        // Function to show an error message
+        function showError(message) {
+            errorMessageText.textContent = message.toLowerCase(); // Ensure error message is lowercase
+            errorMessageBox.classList.remove('hidden');
+            resultArea.classList.add('hidden'); // Hide results when an error occurs
+        }
+
+        // Event listener to add a new session input row
+        addSessionBtn.addEventListener('click', () => {
+            sessionCounter++;
+            const newSessionRow = document.createElement('div');
+            newSessionRow.classList.add('session-row');
+            newSessionRow.innerHTML = `
+                <div class="input-group">
+                    <div class="flex-1">
+                        <label for="hours${sessionCounter}" class="label-text">hours</label>
+                        <input type="number" min="0" class="input-field hours-input" placeholder="0" id="hours${sessionCounter}">
+                    </div>
+                    <div class="flex-1">
+                        <label for="minutes${sessionCounter}" class="label-text">minutes</label>
+                        <input type="number" min="0" max="59" class="input-field minutes-input" placeholder="0" id="minutes${sessionCounter}">
+                    </div>
+                    <button class="btn btn-danger remove-session-btn" type="button" title="remove this session">x</button>
+                </div>
+            `;
+            sessionsContainer.appendChild(newSessionRow);
+            hideError();
+        });
+
+        // Event listener for removing session rows
+        sessionsContainer.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-session-btn')) {
+                event.target.closest('.session-row').remove();
+                hideError();
+            }
+        });
+
+        // Event listener for the "Clear All" button
+        clearAllBtn.addEventListener('click', () => {
+            const sessionRows = sessionsContainer.querySelectorAll('.session-row');
+            for (let i = sessionRows.length - 1; i > 0; i--) {
+                sessionsContainer.removeChild(sessionRows[i]);
+            }
+            if (sessionRows.length > 0) {
+                const firstHoursInput = sessionRows[0].querySelector('.hours-input');
+                const firstMinutesInput = sessionRows[0].querySelector('.minutes-input');
+                if (firstHoursInput) firstHoursInput.value = '';
+                if (firstMinutesInput) firstMinutesInput.value = '';
+            }
+            resultArea.classList.add('hidden');
+            totalTimeEl.textContent = '';
+            totalMinutesEl.textContent = '';
+            hideError();
+        });
+
+        // Event listener to calculate the total time
+        calculateBtn.addEventListener('click', () => {
+            hideError();
+            const hourInputs = document.querySelectorAll('.hours-input');
+            const minuteInputs = document.querySelectorAll('.minutes-input');
+            let totalMinutesAcc = 0;
+
+            for (let i = 0; i < hourInputs.length; i++) {
+                const hours = parseInt(hourInputs[i].value);
+                const minutes = parseInt(minuteInputs[i].value);
+                const currentHours = isNaN(hours) || hourInputs[i].value.trim() === '' ? 0 : hours;
+                const currentMinutes = isNaN(minutes) || minuteInputs[i].value.trim() === '' ? 0 : minutes;
+                
+                if (currentHours < 0 || currentMinutes < 0 || currentMinutes > 59) {
+                    showError('please enter valid positive numbers. hours can be any positive number, minutes must be between 0 and 59.');
+                    return;
+                }
+                totalMinutesAcc += (currentHours * 60) + currentMinutes;
+            }
+
+            const finalHours = Math.floor(totalMinutesAcc / 60);
+            const finalMinutes = totalMinutesAcc % 60;
+
+            totalTimeEl.textContent = `${finalHours} hours and ${finalMinutes} minutes`; // Already lowercase
+            totalMinutesEl.textContent = `(total: ${totalMinutesAcc} minutes)`; // Changed "Total" to "total"
+            resultArea.classList.remove('hidden');
+        });
+    </script>
+
+</body>
+</html>
